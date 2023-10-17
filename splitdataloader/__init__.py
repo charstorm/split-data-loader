@@ -58,6 +58,16 @@ def read_size_prefixed(reader: BinaryIO) -> tuple[bool, bytes]:
     return True, data
 
 
+def read_all_size_prefixed_packets(reader: BinaryIO) -> list[bytes]:
+    result = []
+    while True:
+        valid, data = read_size_prefixed(reader)
+        if not valid:
+            break
+        result.append(data)
+    return result
+
+
 def get_index_file(data_dir_path: Path) -> Path:
     return data_dir_path / "index.dat"
 
@@ -177,17 +187,19 @@ class SplitDataLoader:
             data = reader.read(length)
         return data
 
-    def iterate_binwise(self, shuffle_bins: bool = False) -> Iterator[bytes]:
+    def iterate_binwise(self, shuffle: bool = False) -> Iterator[bytes]:
         """
         Iterate bin by bin (much faster than index based iteration)
         """
-        bin_files = sorted([str(p) for p in self.data_dir_path.rglob("bin*.dat")])
-        if shuffle_bins:
+        bin_files = [str(p) for p in self.data_dir_path.rglob("bin*.dat")]
+        if shuffle:
             random.shuffle(bin_files)
+        else:
+            bin_files.sort()
         for bin_file in bin_files:
             with open(bin_file, "rb") as reader:
-                while True:
-                    valid, data = read_size_prefixed(reader)
-                    if not valid:
-                        break
+                packets = read_all_size_prefixed_packets(reader)
+                if shuffle:
+                    random.shuffle(packets)
+                for data in packets:
                     yield data
