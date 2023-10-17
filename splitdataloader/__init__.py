@@ -1,3 +1,17 @@
+"""
+Source file with functions & classes for hard-drive based data loading for deep learning.
+
+# Functionalities
+
+## Writing
+Use write_split_data() to write multiple packets of byte data, each going to a different
+file (called bins).
+
+## Reading
+The class SplitDataLoader provides the functions required for loading data. It supports
+length calculation and indexing.
+"""
+
 import struct
 import shutil
 import random
@@ -44,6 +58,10 @@ def write_split_data(
 
     target_dir: path to store bin files and index files
 
+    This function will send each packet from input_sequence to a different bin. If shuffle
+    is true, order of bins will be shuffled. This does not shuffle the actual sequence.
+
+    An index file is used to keep track of the bin-index and position of each packet.
     """
     if start_clean:
         shutil.rmtree(target_dir, ignore_errors=True)
@@ -95,13 +113,27 @@ class SplitDataLoader:
         self.index_packet_size = 3 * 4
 
     def __len__(self) -> int:
+        """
+        Calculate and return length of dataset.
+
+        Length calculated based on the size of the index file.
+        """
         index_file_size = self.index_file.stat().st_size
         count = index_file_size // self.index_packet_size
         return count
 
     def __getitem__(self, idx: int) -> bytes:
+        """
+        Return packet at the given index idx.
+
+        First get the info regarding the packet's bin-index, position, and length from
+        the index file. Then read the packet from the bin file based on position and
+        length.
+        """
         location = self.index_packet_size * idx
         values = []
+
+        # Get index, position, length from index-file
         with open(self.index_file, "rb") as reader:
             reader.seek(location)
             for value_idx in range(3):
@@ -110,6 +142,7 @@ class SplitDataLoader:
                     raise ValueError(f"unable to read value for {idx=} {value_idx=}")
                 values.append(value)
 
+        # Get the actual data packet from the bin file
         index, position, length = values
         bin_file = get_bin_file_for_index(self.data_dir_path, index)
         data = b""
