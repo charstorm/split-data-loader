@@ -37,12 +37,33 @@ def read_struct_unpack(reader: BinaryIO) -> tuple[bool, int]:
     return True, number
 
 
+def write_size_prefixed(writer: BinaryIO, data: bytes) -> None:
+    """Write size and data"""
+    struct_pack_write(writer, len(data))
+    writer.write(data)
+
+
+def read_size_prefixed(reader: BinaryIO) -> tuple[bool, bytes]:
+    """
+    Read size and data and return (valid_flag, data).
+
+    In the case of read failure, valid_flag will be false.
+    """
+    valid, size = read_struct_unpack(reader)
+    if not valid:
+        return False, b""
+    data = reader.read(size)
+    if len(data) != size:
+        raise IOError(f"Read size mismatch: {len(data)} != {size}")
+    return True, data
+
+
 def get_index_file(data_dir_path: Path) -> Path:
-    return data_dir_path / "index.bin"
+    return data_dir_path / "index.dat"
 
 
 def get_bin_file_for_index(data_dir_path: Path, index: int) -> Path:
-    file_name_pattern = "part{:08d}.bin"
+    file_name_pattern = "bin{:08d}.dat"
     return data_dir_path / file_name_pattern.format(index)
 
 
