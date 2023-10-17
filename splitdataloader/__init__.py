@@ -16,7 +16,7 @@ import struct
 import shutil
 import random
 
-from typing import Iterable, BinaryIO
+from typing import Iterable, Iterator, BinaryIO
 from pathlib import Path
 
 # Used for storing size (uint32)
@@ -176,3 +176,18 @@ class SplitDataLoader:
                 raise ValueError(f"Size mismatch {packet_size} != {length}")
             data = reader.read(length)
         return data
+
+    def iterate_binwise(self, shuffle_bins: bool = False) -> Iterator[bytes]:
+        """
+        Iterate bin by bin (much faster than index based iteration)
+        """
+        bin_files = sorted([str(p) for p in self.data_dir_path.rglob("bin*.dat")])
+        if shuffle_bins:
+            random.shuffle(bin_files)
+        for bin_file in bin_files:
+            with open(bin_file, "rb") as reader:
+                while True:
+                    valid, data = read_size_prefixed(reader)
+                    if not valid:
+                        break
+                    yield data
