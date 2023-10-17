@@ -88,11 +88,13 @@ def write_split_data(
     Write a sequence of data to multiple bins.
 
     target_dir: path to store bin files and index files
+    input_sequence: input sequence of data (byte)
+    splits: number of splits to use
+    shuffle: if true, shuffle the order of bins
+    start_clean: if true, clear the contents of target_dir before start
 
-    This function will send each packet from input_sequence to a different bin. If shuffle
-    is true, order of bins will be shuffled. This does not shuffle the actual sequence.
-
-    An index file is used to keep track of the bin-index and position of each packet.
+    After the operation, the `target_dir` will contain all the bin files and an index file.
+    Shuffle only shuffles the order of how bins are selected.
     """
     if start_clean:
         shutil.rmtree(target_dir, ignore_errors=True)
@@ -189,7 +191,9 @@ class SplitDataLoader:
 
     def iterate_binwise(self, shuffle: bool = False) -> Iterator[bytes]:
         """
-        Iterate bin by bin (much faster than index based iteration)
+        Iterate bin by bin (much faster than index based iteration).
+
+        shuffle: if true, shuffle the order of bins and data inside bins.
         """
         bin_files = [str(p) for p in self.data_dir_path.rglob("bin*.dat")]
         if shuffle:
