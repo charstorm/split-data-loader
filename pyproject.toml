@@ -1,2 +1,35 @@
-[tool.black]
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["splitdataloader"]
+exclude = []
+namespaces = false
+
+[project]
+name = "splitdataloader"
+version = "0.0.1"
+dependencies = []
+requires-python = ">=3.8"
+authors = [
+  {name = "Vinay Krishnan", email = "nk.vinay@zohomail.in"},
+]
+description = "A simple library to load training data from hdd or ssd"
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["deep-learning", "datasets"]
+classifiers = [
+  "Development Status :: Beta",
+  "Programming Language :: Python"
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff",
+  "mypy",
+]
+
+[tool.ruff]
 line-length = 92

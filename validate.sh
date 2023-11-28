@@ -1,5 +1,5 @@
 set -ex
 src="splitdataloader"
-black $src
-flake8 $src
+ruff format $src
+ruff check $src
 mypy $src
