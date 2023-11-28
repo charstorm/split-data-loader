@@ -1,5 +1,5 @@
 set -ex
 src="splitdataloader"
-ruff format $src
 ruff check $src
+ruff format $src
 mypy $src
