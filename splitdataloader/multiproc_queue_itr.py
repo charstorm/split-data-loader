@@ -39,7 +39,7 @@ class MpQItr:
         self.yield_q = Queue(self.qsize)
         self.proc = Process(
             target=iterator_handler,
-            args=(self.yield_q, self.itr_func, self.args, self.kwargs)
+            args=(self.yield_q, self.itr_func, self.args, self.kwargs),
         )
         self.proc.daemon = True
         self.proc.start()

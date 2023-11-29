@@ -113,9 +113,10 @@ def write_split_data(
         random.shuffle(indexes)
 
     # For every step, we update the index data
-    index_file = open(index_file_path, "wb")
+    index_file = open(index_file_path, "ab")
 
-    for idx, data in enumerate(input_sequence):
+    for frame_idx, data in enumerate(input_sequence):
+        idx = frame_idx % splits
         if shuffle:
             idx = indexes[idx]
 
@@ -139,6 +140,10 @@ def write_split_data(
 
 
 class SplitDataLoader:
+    """
+    Loader for data written using write_split_data()
+    """
+
     def __init__(self, data_dir: str) -> None:
         self.data_dir_path = Path(data_dir)
         self.index_file = get_index_file(self.data_dir_path)
