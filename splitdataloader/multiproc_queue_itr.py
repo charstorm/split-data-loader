@@ -1,8 +1,10 @@
 from multiprocessing import Process, Queue
-from typing import Callable, Any
+from typing import Callable, Any, TypeVar, Generic, Self
 import logging
 
 logger = logging.getLogger(__name__)
+
+T = TypeVar("T")
 
 
 class EndOfQueue:
@@ -24,7 +26,7 @@ def iterator_handler(
     outq.put(EndOfQueue())
 
 
-class MpQItr:
+class MpQItr(Generic[T]):
     """
     Run the iterator in a child process and yield the values.
     """
@@ -35,8 +37,8 @@ class MpQItr:
         self.kwargs = kwargs
         self.qsize = 16
 
-    def __iter__(self):
-        self.yield_q = Queue(self.qsize)
+    def __iter__(self) -> Self:
+        self.yield_q: Queue | None = Queue(self.qsize)
         self.proc = Process(
             target=iterator_handler,
             args=(self.yield_q, self.itr_func, self.args, self.kwargs),
@@ -45,7 +47,10 @@ class MpQItr:
         self.proc.start()
         return self
 
-    def __next__(self):
+    def __next__(self) -> T:
+        if self.yield_q is None:
+            raise StopIteration
+
         item = self.yield_q.get()
         if isinstance(item, EndOfQueue):
             self.proc = None
