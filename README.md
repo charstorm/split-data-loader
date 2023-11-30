@@ -1,19 +1,18 @@
 # split-data-loader
 
-This package contains simple utilities related to writing and reading data 
-(typically training data for machine learning algorithms) based on multiple
-files. There are mainly two extremes when dealing with data.
+This package contains simple utility functions related to writing and reading
+data (typically related to machine learning) using multiple files.
+
+There are mainly two extremes when dealing with data.
 
 1. All the data in a single file - This is good for sequential access,
    but can be cumbersome to shuffle data when reading.
-2. Each data point in its own file - This creates too many tiny files
+2. Each frame in its own file - This creates too many tiny files
    and can be difficult to scale.
 
 This library uses an intermediate approach. The entire dataset is split and
-stored in multiple files (eg: N = 128) called bins. This allows shuffling data
-in a simple manner using a two step process. During loading, the order of the
-bins and order of the data loaded from each bin are shuffled. This allows
-simple iteration to handle shuffling.
+stored in multiple files (eg: N = 128) called bins. It allows easy shuffling of
+data and parallel processing when required.
 
 This library also uses an index file to keep track of the order and location of
 each packet. It allows index based random lookup of all the input packets,
