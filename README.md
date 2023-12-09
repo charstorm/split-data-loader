@@ -18,6 +18,13 @@ This library also uses an index file to keep track of the order and location of
 each packet. It allows index based random lookup of all the input packets,
 distributed among all the bin files.
 
+## Installation
+
+Use pip. [Project](https://pypi.org/project/splitdataloader/) is available at PyPI.
+
+```
+pip install splitdataloader
+```
 
 ## Writing Data
 Use `write_split_data` to write data to a target directory.
