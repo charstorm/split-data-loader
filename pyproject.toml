@@ -21,9 +21,11 @@ readme = "README.md"
 license = {file = "LICENSE"}
 keywords = ["deep-learning", "datasets"]
 classifiers = [
-  "Development Status :: Beta",
   "Programming Language :: Python"
 ]
+
+[project.urls]
+Homepage = "https://github.com/charstorm/split-data-loader/"
 
 [project.optional-dependencies]
 dev = [

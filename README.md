@@ -21,7 +21,7 @@ distributed among all the bin files.
 
 ## Writing Data
 Use `write_split_data` to write data to a target directory.
-   
+
 ```python
 from splitdataloader import write_split_data
 
@@ -34,7 +34,7 @@ def example_writer(...):
 
 ## Reading Data
 This is the main objective of this library. The class `SplitDataLoader` handles
-the loading of data. 
+the loading of data.
 It supports the following:
 1. Getting length using `len()`
 2. Random indexing using `[]`
@@ -52,7 +52,34 @@ def example_loader(...):
     # Supports indexing
     data  = loader[2]
     # Supports iteration
-    for data in loader.iterate_binwise():
+    for data in loader.iterate_binwise(shuffle=True):
         do_something(data)
 ```
 
+## Multiprocessing Queue Based Iterator
+If the loading takes too much time, it is probably a good idea to run the
+loading part in a separate process. If it is possible to refactor the entity
+that produces the batches as a generator, `splitdataloader.MpQItr` can
+be used to handle loading. Data will be loaded to an internal queue while
+it is being processed in the main process.
+
+```python
+from splitdataloader import MpQItr
+
+# a tuple, class, or whatever that handles the batch
+class BatchType:
+    ...
+
+# a generator function that produces the batches
+def batch_generator(...) -> Iterator[BatchType]:
+    ...
+
+def batch_wise_processing(...):
+    # Multi-processing queue based iterator
+    queued_batch_iterator = MpQItr[BatchType](
+        batch_generator,  # the generator function
+        args... # args or kwargs to the generator function
+    )
+    for batch in queued_batch_iterator:
+        do_something_with(batch)
+```
