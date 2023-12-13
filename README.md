@@ -18,6 +18,10 @@ This library also uses an index file to keep track of the order and location of
 each packet. It allows index based random lookup of all the input packets,
 distributed among all the bin files.
 
+> [!NOTE]
+> The "split" here has nothing to do with train/test split. It is expected that
+> train/test split is done before writing data using the methods given here.
+
 ## Installation
 
 Use pip. [Project](https://pypi.org/project/splitdataloader/) is available at PyPI.
